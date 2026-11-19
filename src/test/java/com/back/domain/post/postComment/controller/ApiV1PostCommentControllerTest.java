@@ -115,7 +115,7 @@ public class ApiV1PostCommentControllerTest {
 
         ResultActions resultActions = mvc
                 .perform(
-                        put("/api/v1/posts/%d/comments/%d".formatted(postId, id))
+                        put("/api/v1/posts/%d/comments/%d?actorId=3".formatted(postId, id))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("""
                                         {
@@ -208,5 +208,29 @@ public class ApiV1PostCommentControllerTest {
                 .andExpect(jsonPath("$.msg").value("권한이 없습니다."));
     }
 
+    @Test
+    @DisplayName("댓글 수정, 작성자가 아니면 403")
+    void t8() throws Exception {
+        int postId = 1;
+        int id = 1;
 
+        ResultActions resultActions = mvc
+                .perform(
+                        put("/api/v1/posts/%d/comments/%d?actorId=4".formatted(postId, id))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                        {
+                                            "content": "내용 new"
+                                        }
+                                        """)
+                )
+                .andDo(print());
+
+        resultActions
+                .andExpect(handler().handlerType(ApiV1PostCommentController.class))
+                .andExpect(handler().methodName("modify"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.resultCode").value("403-1"))
+                .andExpect(jsonPath("$.msg").value("권한이 없습니다."));
+    }
 }
