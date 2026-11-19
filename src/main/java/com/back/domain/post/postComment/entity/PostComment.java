@@ -1,5 +1,6 @@
 package com.back.domain.post.postComment.entity;
 
+import com.back.domain.member.member.entity.Member;
 import com.back.domain.post.post.entity.Post;
 import com.back.global.jpa.entity.BaseEntity;
 import jakarta.persistence.Entity;
@@ -15,10 +16,13 @@ import static jakarta.persistence.FetchType.LAZY;
 public class PostComment extends BaseEntity {
     @ManyToOne(fetch = LAZY)
     private Post post;
+    @ManyToOne(fetch = LAZY)
+    private Member author;
     private String content;
 
-    public PostComment(Post post, String content) {
+    public PostComment(Post post, Member author, String content) {
         this.post = post;
+        this.author = author;
         this.content = content;
     }
 

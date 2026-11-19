@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -259,5 +260,23 @@ public class ApiV1PostControllerTest {
                     .andExpect(jsonPath("$[%d].title".formatted(i)).value(post.getTitle()))
                     .andExpect(jsonPath("$[%d].content".formatted(i)).value(post.getContent()));
         }
+    }
+
+    @Test
+    @DisplayName("샘플 글/댓글의 작성자")
+    void t10() {
+        Post post1 = postService.findById(1).get();
+        Post post2 = postService.findById(2).get();
+        Post post3 = postService.findById(3).get();
+
+        assertThat(post1.getAuthor().getUsername()).isEqualTo("user1");
+        assertThat(post2.getAuthor().getUsername()).isEqualTo("user2");
+        assertThat(post3.getAuthor().getUsername()).isEqualTo("user3");
+
+        assertThat(post1.findCommentById(1).get().getAuthor().getUsername()).isEqualTo("user1");
+        assertThat(post1.findCommentById(2).get().getAuthor().getUsername()).isEqualTo("user2");
+        assertThat(post1.findCommentById(3).get().getAuthor().getUsername()).isEqualTo("user3");
+        assertThat(post2.findCommentById(4).get().getAuthor().getUsername()).isEqualTo("user1");
+        assertThat(post2.findCommentById(5).get().getAuthor().getUsername()).isEqualTo("user2");
     }
 }
