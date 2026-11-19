@@ -37,7 +37,7 @@ public class ApiV1PostControllerTest {
     void t1() throws Exception {
         ResultActions resultActions = mvc
                 .perform(
-                        post("/api/v1/posts")
+                        post("/api/v1/posts?actorId=3")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("""
                                         {
@@ -49,6 +49,8 @@ public class ApiV1PostControllerTest {
                 .andDo(print());
 
         Post post = postService.findLatest().get();
+
+        assertThat(post.getAuthor().getUsername()).isEqualTo("user1");
 
         resultActions
                 .andExpect(handler().handlerType(ApiV1PostController.class))
@@ -68,7 +70,7 @@ public class ApiV1PostControllerTest {
     void t7() throws Exception {
         ResultActions resultActions = mvc
                 .perform(
-                        post("/api/v1/posts")
+                        post("/api/v1/posts?actorId=3")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("""
                                         {
@@ -95,7 +97,7 @@ public class ApiV1PostControllerTest {
     void t8() throws Exception {
         ResultActions resultActions = mvc
                 .perform(
-                        post("/api/v1/posts")
+                        post("/api/v1/posts?actorId=3")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("""
                                         {
@@ -129,7 +131,7 @@ public class ApiV1PostControllerTest {
 
         ResultActions resultActions = mvc
                 .perform(
-                        post("/api/v1/posts")
+                        post("/api/v1/posts?actorId=3")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(wrongJsonBody)
                 )
@@ -279,4 +281,27 @@ public class ApiV1PostControllerTest {
         assertThat(post2.findCommentById(4).get().getAuthor().getUsername()).isEqualTo("user1");
         assertThat(post2.findCommentById(5).get().getAuthor().getUsername()).isEqualTo("user2");
     }
+
+    @Test
+    @DisplayName("글 작성, without actorId")
+    void t11() throws Exception {
+        ResultActions resultActions = mvc
+                .perform(
+                        post("/api/v1/posts")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                        {
+                                            "title": "제목",
+                                            "content": "내용"
+                                        }
+                                        """)
+                )
+                .andDo(print());
+
+        resultActions
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.resultCode").value("401-1"))
+                .andExpect(jsonPath("$.msg").value("로그인 후 이용해주세요."));
+    }
+
 }
