@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 import com.back.domain.member.member.entity.Member;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -129,4 +130,24 @@ public class ApiV1MemberControllerTest {
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.resultCode").value("401-1"));
     }
+
+    @Test
+    @DisplayName("샘플 회원 6명이 생성되어 있다")
+    void t6() throws Exception {
+        Member user1 = memberService.findByUsername("user1").get();
+
+        ResultActions resultActions = mvc
+                .perform(
+                        get("/api/v1/members/me?actorId=" + user1.getId())
+                )
+                .andDo(print());
+
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.username").value("user1"))
+                .andExpect(jsonPath("$.name").value("유저1"));
+
+        assertThat(memberService.count()).isEqualTo(6);
+    }
+
 }
