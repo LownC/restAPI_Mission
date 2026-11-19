@@ -9,9 +9,12 @@ import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+
+import com.back.global.globalExceptionHandler.GlobalExceptionHandler.AccessDeniedException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 
 import static jakarta.persistence.CascadeType.PERSIST;
 import static jakarta.persistence.CascadeType.REMOVE;
@@ -58,5 +61,9 @@ public class Post extends BaseEntity {
         if (postComment == null) return false;
 
         return comments.remove(postComment);
+    }
+
+    public void checkActorCanDelete(Member actor){
+        if (author.getId() != actor.getId()) throw new AccessDeniedException();
     }
 }

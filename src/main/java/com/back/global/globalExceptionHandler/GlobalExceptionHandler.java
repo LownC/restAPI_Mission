@@ -91,4 +91,19 @@ public class GlobalExceptionHandler {
     public static class UnauthenticatedException extends RuntimeException {
     }
 
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<RsData<Void>> handle(AccessDeniedException ex) {
+        return new ResponseEntity<>(
+                new RsData<>(
+                        "403-1",
+                        "권한이 없습니다."
+                ),
+                FORBIDDEN
+        );
+    }
+
+    public static class AccessDeniedException extends RuntimeException {
+    }
+
+
 }

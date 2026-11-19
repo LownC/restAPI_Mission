@@ -117,7 +117,7 @@ public class ApiV1PostCommentController {
         Member actor = memberService.getActor(actorId);
         Post post = postService.findById(postId).get();
 
-        PostComment postComment = postService.writeComment(actor, post, reqBody.content); // TODO 009에서 actor로 교체
+        PostComment postComment = postService.writeComment(actor, post, reqBody.content);
 
         postService.flush();
 
