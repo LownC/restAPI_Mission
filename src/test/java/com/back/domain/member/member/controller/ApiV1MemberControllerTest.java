@@ -1,5 +1,6 @@
 package com.back.domain.member.member.controller;
 
+import com.back.domain.member.member.service.MemberService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class ApiV1MemberControllerTest {
     @Autowired
     private MockMvc mvc;
+    @Autowired
+    private MemberService memberService;
 
     @Test
     @DisplayName("회원가입")
@@ -46,5 +49,32 @@ public class ApiV1MemberControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.resultCode").value("201-1"))
                 .andExpect(jsonPath("$.msg").value("무명님 환영합니다. 회원가입이 완료되었습니다."));
+    }
+
+    @Test
+    @DisplayName("회원가입, 이미 사용중인 username")
+    void t2() throws Exception {
+        memberService.join("usernew", "12345678", "무명");
+
+        ResultActions resultActions = mvc
+                .perform(
+                        post("/api/v1/members/join")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                        {
+                                            "username": "usernew",
+                                            "password": "12345678",
+                                            "name": "무명"
+                                        }
+                                        """)
+                )
+                .andDo(print());
+
+        resultActions
+                .andExpect(handler().handlerType(ApiV1MemberController.class))
+                .andExpect(handler().methodName("join"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.resultCode").value("409-1"))
+                .andExpect(jsonPath("$.msg").value("usernew(은)는 이미 사용중인 username 입니다."));
     }
 }
