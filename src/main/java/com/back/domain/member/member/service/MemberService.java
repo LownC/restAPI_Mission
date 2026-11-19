@@ -5,6 +5,7 @@ import com.back.domain.member.member.repository.MemberRepository;
 import com.back.global.globalExceptionHandler.GlobalExceptionHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.back.global.globalExceptionHandler.GlobalExceptionHandler.UnauthenticatedException;
 
 import java.util.Optional;
 
@@ -31,4 +32,16 @@ public class MemberService {
     public Optional<Member> findByUsername(String username){
         return memberRepository.findByUsername(username);
     }
+
+    public Optional<Member> findById(int id) {
+        return memberRepository.findById(id);
+    }
+
+    public Member getActor(Integer actorId) {
+        if (actorId == null) throw new UnauthenticatedException();
+
+        return memberRepository.findById(actorId)
+                .orElseThrow(UnauthenticatedException::new);
+    }
+
 }

@@ -5,7 +5,7 @@ import com.back.domain.member.member.service.MemberService;
 import com.back.global.rsData.RsData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.back.domain.member.member.dto.MemberDto;
+import org.springframework.web.bind.annotation.*;
+
 
 @RestController
 @RequestMapping("/api/v1/members")
@@ -47,5 +50,17 @@ public class ApiV1MemberController {
                 "%s님 환영합니다. 회원가입이 완료되었습니다.".formatted(member.getName())
         );
     }
+
+    @GetMapping("/me")
+    @Transactional(readOnly = true)
+    @Operation(summary = "내 정보")
+    public MemberDto me(
+            @RequestParam(required = false) Integer actorId
+    ) {
+        Member actor = memberService.getActor(actorId);
+
+        return new MemberDto(actor);
+    }
+
 
 }

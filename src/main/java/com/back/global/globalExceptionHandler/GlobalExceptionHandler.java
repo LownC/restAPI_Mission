@@ -77,4 +77,18 @@ public class GlobalExceptionHandler {
         private final String username;
     }
 
+    @ExceptionHandler(UnauthenticatedException.class)
+    public ResponseEntity<RsData<Void>> handle(UnauthenticatedException ex) {
+        return new ResponseEntity<>(
+                new RsData<>(
+                        "401-1",
+                        "로그인 후 이용해주세요."
+                ),
+                UNAUTHORIZED
+        );
+    }
+
+    public static class UnauthenticatedException extends RuntimeException {
+    }
+
 }
