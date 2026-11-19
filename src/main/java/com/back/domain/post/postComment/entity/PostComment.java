@@ -8,6 +8,8 @@ import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import com.back.global.globalExceptionHandler.GlobalExceptionHandler.AccessDeniedException;
+
 import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
@@ -28,5 +30,9 @@ public class PostComment extends BaseEntity {
 
     public void modify(String content) {
         this.content = content;
+    }
+
+    public void checkActorCanDelete(Member actor){
+        if(author.getId() != actor.getId()) throw new AccessDeniedException();
     }
 }
